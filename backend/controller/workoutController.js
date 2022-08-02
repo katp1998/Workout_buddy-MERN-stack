@@ -1,5 +1,6 @@
 const Workout = require("../models/workoutModel");
 const asyncHandler = require("express-async-handler");
+const mongoose = require("mongoose");
 
 //Description: Get all workouts
 //Method: GET
@@ -44,13 +45,12 @@ const createWorkout = asyncHandler(async (rq, rs) => {
 //Route: /api/workouts/:id
 //Access: PRIVATE
 const getWorkout = asyncHandler(async (rq, rs) => {
-  const workout = await Workout.findById(rq.params.id);
-
   //check if the workout exists
-  if (!workout) {
+  if (!mongoose.Types.ObjectId.isValid(rq.params.id)) {
     rs.status(400);
     throw new Error("No Workout found");
   }
+  const workout = await Workout.findById({ _id: rq.params.id });
 
   rs.status(200).json(workout);
 });
@@ -60,11 +60,18 @@ const getWorkout = asyncHandler(async (rq, rs) => {
 //Route: /api/workouts/:id
 //Access: PRIVATE
 const deleteWorkout = asyncHandler(async (rq, rs) => {
-  const workout = await Workout.findById(rq.params.id);
-  //check if the workout exists
-  if (!workout) {
+  //check if the id is valid
+  if (!mongoose.Types.ObjectId.isValid(rq.params.id)) {
     rs.status(400);
     throw new Error("No Workout found");
+  }
+
+  const workout = await Workout.findById({ _id: rq.params.id });
+
+  //check if workout exists
+  if (!workout) {
+    rs.status(400);
+    throw new Error("No workout found");
   }
   //delete workout:
   await workout.remove();
@@ -76,7 +83,25 @@ const deleteWorkout = asyncHandler(async (rq, rs) => {
 //Route: /api/workouts/:id
 //Access: PRIVATE
 const updateWorkout = asyncHandler(async (rq, rs) => {
-  rs.json({ message: "UPDATE a workout" });
+  //check if the id is valid
+  if (!mongoose.Types.ObjectId.isValid(rq.params.id)) {
+    rs.status(400);
+    throw new Error("No Workout found");
+  }
+
+  //update workout:
+  const updatedWorkout = await Workout.findOneAndUpdate(
+    { _id: rq.params.id },
+    {
+      ...rq.body,
+    }
+  );
+  //check if workout exists
+  if (!updatedWorkout) {
+    rs.status(400);
+    throw new Error("No workout found");
+  }
+  rs.status(200).json(updatedWorkout);
 });
 
 module.exports = {
