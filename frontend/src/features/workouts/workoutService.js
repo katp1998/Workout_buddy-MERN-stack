@@ -32,3 +32,13 @@ const updateWorkout = async (workoutid, workoutData) => {
   const respose = await axios.patch(API_URL + workoutid, workoutData);
   return respose.data;
 };
+
+const workoutService = {
+  fetchAllWorkouts,
+  fetchAWorkout,
+  createWorkout,
+  deleteWorkout,
+  updateWorkout,
+};
+
+export default workoutService;
