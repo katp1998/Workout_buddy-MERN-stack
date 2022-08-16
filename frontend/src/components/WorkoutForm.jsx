@@ -1,30 +1,51 @@
 import React from 'react'
+import { useState, useEffect } from 'react'
+import {useSelector, useDispatch} from 'react-redux'
+import {useNavigate} from 'react-router-dom'
+import {toast} from 'toastify'
+import {createWorkout, reset} from '../features/workouts/workoutSlice'
 
 
 function WorkoutForm() {
-    const [title, setTitle] = useState('');
-    const [load, setLoad] = useState('');
-    const [reps, setReps] = useState('');
+   const dispatch = useDispatch();
+   const navigate = useNavigate();
+    
+   const [formData, setFormData] = useState({
+        title: '',
+        load: 0,
+        reps: 0
+    })
 
-    const funcTitle = (e) =>{
-        setTitle(e.target.value)
-    }
+    const { title, load, reps } = formData
 
-    const funcLoad = (e) =>{
-        setLoad(e.target.value)
-    }
+    //states from workoutSlice
+    const { isError, isSuccess, isLoading, message} = useSelector((state) => state.workout)
 
-    const funcReps = (e) =>{
-        setReps(e.target.value)
-    }
-
-    const onSubmit = async(e) =>{
-        e.preventDefault(); //to avoid the page being refreshed
-        const workout = {title, workout, reps}
-        const response = await fetch('/api/workouts/create')
-    }
+    //to monitor the states
+    useEffect(() =>{
+        if(isError){
+           toast.error(message) 
+        }
+        dispatch(reset())
+    }, [isError, message, dispatch])
 
 
+const onChange = (e) =>{
+    //setting formData to prev state
+    setFormData((prevState) => ({
+        ...prevState,
+        [e.target.name]: e.target.value
+    }))
+}
+
+const onSubmit = (e) => {
+    e.preventDefault();
+
+    //get items from the form
+    const enteredData = {title, load, reps}
+    //put it into the function in workoutslice
+    dispatch(createWorkout(enteredData))
+}
 
 
   return (
@@ -33,11 +54,11 @@ function WorkoutForm() {
             Add a new workout!
         </h3>
         <label>Exercise title: </label>
-        <input type="text" onChange={funcTitle} value={title} />
+        <input type="text" onChange={onChange} name = "title" value={title} />
         <label>Load (in kg): </label>
-        <input type="number" onChange={funcLoad} value={load} />
+        <input type="number" onChange={onChange} name = "load" value={load} />
         <label>Reps: </label>
-        <input type="number" onChange={funcReps} value={reps} />
+        <input type="number" onChange={onChange} name = "reps" value={reps} />
 
         <button>Add Workout</button>
     </form>
