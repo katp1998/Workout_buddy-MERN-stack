@@ -1,5 +1,7 @@
 //services are used for making HTTP requests and setting/getting any data from local storage
 
+import axios from "axios";
+
 //backend API URL
 const API_URL = "/api/workout/";
 
