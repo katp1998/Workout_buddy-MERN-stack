@@ -3,7 +3,7 @@
 import axios from "axios";
 
 //backend API URL
-const API_URL = "/api/workout/";
+const API_URL = "/api/workouts/";
 
 //Get all workouts
 const fetchAllWorkouts = async () => {

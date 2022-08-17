@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 //Route: /api/workouts/all
 //Access: PRIVATE
 const getWorkouts = asyncHandler(async (rq, rs) => {
-  const workouts = await Workout.find({}).sort({ createdAt: -1 });
+  const workouts = await Workout.find({ rq }).sort({ createdAt: -1 });
 
   if (!workouts) {
     rs.status(400);
