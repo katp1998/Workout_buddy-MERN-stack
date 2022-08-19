@@ -1,5 +1,10 @@
 import React from 'react'
 import {useEffect, useState} from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+
+//methods
+import { fetchAllWorkouts, reset } from '../features/workouts/workoutSlice'
 
 //components
 import WorkoutDetails from '../components/WorkoutDetails'
@@ -7,30 +12,35 @@ import WorkoutForm from '../components/WorkoutForm'
 
 
 function Home() {
-  const [workouts, setWorkouts] = useState(null)
+  const navigate = useNavigate()
+  const dispatch =  useDispatch()
+  
+  //states
+  const {workouts, isLoading, isSuccess, isError, message} = useSelector((state) => state.workout)
 
   useEffect(() =>{
-    //fetch all workouts
-    const fetchWorkouts = async () =>{
-      const response = await fetch('/api/workouts/all')
-      const json = await response.json();
-
-      if (response.ok){
-        setWorkouts(json)
-      }
+    if(isError){
+      console.log(message);
+    }else{
+      dispatch(fetchAllWorkouts())
     }
-    fetchWorkouts()
-  }, [])
+    
+    return () => {
+      dispatch(reset())
+    }
+
+  }, [dispatch, isError, message])
   
   
   
   return (
     <div className='home'>
+      {workouts.length > 0 ?(
       <div className="workouts">
         {workouts && workouts.map((workout) => (
           <WorkoutDetails key={workout._id} workout = {workout}/>
         ))}
-      </div>
+      </div>) : (<h3>You don't have any workouts added!</h3>)}
       <WorkoutForm />
     </div>
   )
