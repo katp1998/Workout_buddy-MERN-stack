@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 
 //routes
 app.use("/api/workouts", require("./routes/workoutRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
 
 //listening to rq
 app.listen(port, () => {
