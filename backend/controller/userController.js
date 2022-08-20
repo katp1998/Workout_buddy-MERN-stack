@@ -72,10 +72,10 @@ const loginUser = asyncHandler(async (rq, rs) => {
   }
 });
 
-//discp: GET USER WORKOUTS
+//discp: GET USER
 //route: GET /api/users/myworkouts
 //access: private
-const getUserWorkouts = asyncHandler(async (rq, rs) => {
+const getUser = asyncHandler(async (rq, rs) => {
   const { _id, name, email } = await User.findById(rq.user.id); //have access since we set in the middleware
   rs.status(200).json({
     id: _id,
@@ -94,5 +94,5 @@ const generateToken = (id) => {
 module.exports = {
   registerUser,
   loginUser,
-  getUserWorkouts,
+  getUser,
 };

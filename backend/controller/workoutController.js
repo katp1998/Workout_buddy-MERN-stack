@@ -1,20 +1,14 @@
 const Workout = require("../models/workoutModel");
+const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
-const mongoose = require("mongoose");
 
 //Description: Get all workouts
 //Method: GET
 //Route: /api/workouts/all
 //Access: PRIVATE
 const getWorkouts = asyncHandler(async (rq, rs) => {
-  const workouts = await Workout.find({ rq }).sort({ createdAt: -1 });
-
-  if (!workouts) {
-    rs.status(400);
-    throw new Error("No workouts to show");
-  } else {
-    rs.status(200).json(workouts);
-  }
+  const workouts = await Workout.find({ user: rq.user.id });
+  rs.status(200).json(workouts);
 });
 
 //Description: Create new workout
@@ -23,35 +17,19 @@ const getWorkouts = asyncHandler(async (rq, rs) => {
 //Access: PRIVATE
 const createWorkout = asyncHandler(async (rq, rs) => {
   const { title, reps, load } = rq.body;
-
-  //check if the title is included! opt: reps, load
-  if (!title) {
+  if (!title || !reps || !load) {
+    //if there is no text item in the body of the request
     rs.status(400);
-    throw new Error("Please enter title of the workout!");
+    throw new Error("Please add a text field");
   }
 
   //create the workout
-  try {
-    const workout = await Workout.create({ title, reps, load });
-    rs.status(200).json(workout);
-  } catch (error) {
-    rs.status(400);
-    throw new Error("Error in creating workout");
-  }
-});
-
-//Description: Gets a specific workout
-//Method: GET
-//Route: /api/workouts/:id
-//Access: PRIVATE
-const getWorkout = asyncHandler(async (rq, rs) => {
-  //check if the workout exists
-  if (!mongoose.Types.ObjectId.isValid(rq.params.id)) {
-    rs.status(400);
-    throw new Error("No Workout found");
-  }
-  const workout = await Workout.findById({ _id: rq.params.id });
-
+  const workout = await Workout.create({
+    title: rq.body.title,
+    reps: rq.body.reps,
+    load: rq.body.load,
+    user: rq.user.id,
+  });
   rs.status(200).json(workout);
 });
 
@@ -60,52 +38,68 @@ const getWorkout = asyncHandler(async (rq, rs) => {
 //Route: /api/workouts/:id
 //Access: PRIVATE
 const deleteWorkout = asyncHandler(async (rq, rs) => {
-  //check if the id is valid
-  if (!mongoose.Types.ObjectId.isValid(rq.params.id)) {
-    rs.status(400);
-    throw new Error("No Workout found");
-  }
-
-  const workout = await Workout.findById({ _id: rq.params.id });
+  const workout = await Workout.findById(rq.params.id);
 
   //check if workout exists
   if (!workout) {
     rs.status(400);
     throw new Error("No workout found");
   }
+
+  //getting user
+  const user = await User.findById(rq.user.id);
+
+  //validation: if the user doesnt exist:
+  if (!user) {
+    rs.status(401);
+    throw new Error("User not found");
+  }
+
+  //validation: if the logged in user matches the workout user
+  if (workout.user.toString() !== user.id) {
+    rs.status(401);
+    throw new Error("User not authorized");
+  }
+
   //delete workout:
   await workout.remove();
-  rs.status(200).json(workout);
+  rs.status(200).json({ id: rq.params.id });
 });
 
 //Description: update a specific workout
-//Method: PATCH
+//Method: PUT
 //Route: /api/workouts/:id
 //Access: PRIVATE
 const updateWorkout = asyncHandler(async (rq, rs) => {
-  //check if the id is valid
-  if (!mongoose.Types.ObjectId.isValid(rq.params.id)) {
+  const workout = await Workout.findById(rq.params.id);
+
+  if (!workout) {
     rs.status(400);
-    throw new Error("No Workout found");
+    throw new Error("Workout not found");
   }
 
-  //update workout:
-  const updatedWorkout = await Workout.findOneAndUpdate(
-    { _id: rq.params.id },
-    {
-      ...rq.body,
-    }
-  );
-  //check if workout exists
-  if (!updatedWorkout) {
-    rs.status(400);
-    throw new Error("No workout found");
+  //getting user
+  const user = await User.findById(rq.user.id);
+
+  //validation: if the user doesnt exist:
+  if (!user) {
+    rs.status(401);
+    throw new Error("User not found");
   }
+
+  //validation: if the logged in user matches the goal user
+  if (workout.user.toString() !== user.id) {
+    rs.status(401);
+    throw new Error("User not authorized");
+  }
+  const updatedWorkout = await Goal.findByIdAndUpdate(rq.params.id, rq.body, {
+    new: true,
+  });
+
   rs.status(200).json(updatedWorkout);
 });
 
 module.exports = {
-  getWorkout,
   getWorkouts,
   createWorkout,
   deleteWorkout,

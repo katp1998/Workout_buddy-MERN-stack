@@ -3,12 +3,12 @@ const router = express.Router();
 const {
   registerUser,
   loginUser,
-  getUserWorkouts,
+  getUser,
 } = require("../controller/userController");
 const { protect } = require("../middleware/authMiddleware");
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.get("/myworkouts", protect, getUserWorkouts);
+router.get("/me", protect, getUser);
 
 module.exports = router;
