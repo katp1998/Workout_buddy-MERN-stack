@@ -16,20 +16,25 @@ function Home() {
   const dispatch =  useDispatch()
   
   //states
+  const { user } = useSelector((state) => state.auth)
   const {workouts, isLoading, isSuccess, isError, message} = useSelector((state) => state.workout)
+  
 
   useEffect(() =>{
     if(isError){
-      console.log(message);
-    }else{
+      console.log("THIS IS THE ERROR");
+    }
+    if (user){
       dispatch(fetchAllWorkouts())
+    }else{
+      navigate('/login')
     }
     
     return () => {
       dispatch(reset())
     }
 
-  }, [dispatch, isError, message])
+  }, [user, navigate, dispatch, isError, message])
   
   
   
@@ -37,7 +42,7 @@ function Home() {
     <div className='home'>
       {workouts.length > 0 ?(
       <div className="workouts">
-        {workouts && workouts.map((workout) => (
+        {workouts.map((workout) => (
           <WorkoutDetails key={workout._id} workout = {workout}/>
         ))}
       </div>) : (<h3>You don't have any workouts added!</h3>)}

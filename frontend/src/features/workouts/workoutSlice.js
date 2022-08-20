@@ -14,25 +14,8 @@ export const fetchAllWorkouts = createAsyncThunk(
   "workouts/getAll",
   async (_, thunkAPI) => {
     try {
-      return await workoutService.fetchAllWorkouts();
-    } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-      return thunkAPI.rejectWithValue(message);
-    }
-  }
-);
-
-//get a workout
-export const fetchAWorkout = createAsyncThunk(
-  "workouts/getOne",
-  async (workoutid, thunkAPI) => {
-    try {
-      return await workoutService.fetchAWorkout(workoutid);
+      const token = thunkAPI.getState().auth.user.token;
+      return await workoutService.fetchAllWorkouts(token);
     } catch (error) {
       const message =
         (error.response &&
@@ -50,7 +33,8 @@ export const createWorkout = createAsyncThunk(
   "workouts/create",
   async (workoutData, thunkAPI) => {
     try {
-      return await workoutService.createWorkout(workoutData);
+      const token = thunkAPI.getState().auth.user.token;
+      return await workoutService.createWorkout(workoutData, token);
     } catch (error) {
       const message =
         (error.response &&
@@ -68,7 +52,8 @@ export const deleteWorkout = createAsyncThunk(
   "workouts/delete",
   async (workoutid, thunkAPI) => {
     try {
-      return await workoutService.deleteWorkout(workoutid);
+      const token = thunkAPI.getState().auth.user.token;
+      return await workoutService.deleteWorkout(workoutid, token);
     } catch (error) {
       const message =
         (error.response &&
@@ -84,9 +69,10 @@ export const deleteWorkout = createAsyncThunk(
 //updating a workout
 export const updateWorkout = createAsyncThunk(
   "workout/update",
-  async (workoutid, workoutData) => {
+  async (workoutid, workoutData, thunkAPI) => {
     try {
-      return await workoutService.updateWorkout(workoutid, workoutData);
+      const token = thunkAPI.getState().auth.user.token;
+      return await workoutService.updateWorkout(workoutid, workoutData, token);
     } catch (error) {
       return console.log(error);
     }
@@ -110,19 +96,6 @@ export const workoutSlice = createSlice({
         state.workouts = action.payload;
       })
       .addCase(fetchAllWorkouts.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.message = action.payload;
-      })
-      .addCase(fetchAWorkout.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(fetchAWorkout.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isSuccess = true;
-        state.workouts = action.payload;
-      })
-      .addCase(fetchAWorkout.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

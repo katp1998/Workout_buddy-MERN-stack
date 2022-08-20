@@ -11,21 +11,34 @@ body {
   margin: 0;
   font-family: "Poppins";
 }
-header {
-  background: #fff;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #e6e6e6;
+  margin-bottom: 60px;
 }
-header .container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 10px 20px;
+
+.header ul {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-header a {
-  color: #333;
-  text-decoration: none;
+
+.header ul li {
+  margin-left: 20px;
 }
+
+.header ul li a {
+  display: flex;
+  align-items: center;
+}
+
+.header ul li a:hover {
+  color: #777;
+}
+
 .pages{
   max-width: 1400px;
   padding: 20px;
@@ -172,4 +185,31 @@ input.error {
 
 .heading p {
   color: #828282;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #e6e6e6;
+  margin-bottom: 60px;
+}
+
+.header ul {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header ul li {
+  margin-left: 20px;
+}
+
+.header ul li a {
+  display: flex;
+  align-items: center;
+}
+
+.header ul li a:hover {
+  color: #777;
 }
